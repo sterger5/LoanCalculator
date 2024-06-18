@@ -50,38 +50,20 @@ int main()
 			//决定等额本息还是等额本金
 			int wayFlag;
 			cout << "请选择提前方案(1、月供减少，期限不变，2、月供不变，期限缩短)："; cin >> planFlag;
-			if (planFlag == 1)
+
+			cout << "请选择后续偿还方式(1、等额本息，2、等额本金)："; cin >> wayFlag;
+			if (wayFlag == 1)
 			{
-				cout << "请选择后续偿还方式(1、等额本息，2、等额本金)："; cin >> wayFlag;
-				if (wayFlag == 1)
-				{
-					cout << endl;
-					Prepay* Prepayer = new PartEMIprepay(prepayAmount, prepayTime, newRate, vec, 1, debtor->getPeriods());
-					Prepayer->showSchedule();
-				}
-				else if (wayFlag == 2)
-				{
-					cout << endl;
-					Prepay* Prepayer = new PartEPPprepay(prepayAmount, prepayTime, newRate, vec, 1, debtor->getPeriods());
-					Prepayer->showSchedule();
-				}
+				cout << endl;
+				Prepay* Prepayer = new PartEMIprepay(prepayAmount, prepayTime, newRate, vec, planFlag, debtor->getPeriods());
+				Prepayer->showSchedule();
 			}
-			else if (planFlag == 2)
+			else if (wayFlag == 2)
 			{
-				cout << "请选择后续偿还方式(1、等额本息，2、等额本金)："; cin >> wayFlag;
-				if (wayFlag == 1)
-				{
-					cout << endl;
-					Prepay* Prepayer = new PartEMIprepay(prepayAmount, prepayTime, newRate, vec, 2, debtor->getPeriods());
-					Prepayer->showSchedule();
-				}
-				else if (wayFlag == 2)
-				{
-					cout << endl;
-					Prepay* Prepayer = new PartEPPprepay(prepayAmount, prepayTime, newRate, vec, 2, debtor->getPeriods());
-					Prepayer->showSchedule();
-				}
-			}
+				cout << endl;
+				Prepay* Prepayer = new PartEPPprepay(prepayAmount, prepayTime, newRate, vec, planFlag, debtor->getPeriods());
+				Prepayer->showSchedule();
+			}	
 		}
 	}
 	
