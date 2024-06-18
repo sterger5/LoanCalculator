@@ -4,7 +4,7 @@ vector<tuple<double,double,double,double>> getEPPschedule(double Principal, doub
 {
 	vector<tuple<double,double,double,double>> EPP_Schedule;
 
-	double monthlyPrincipal = Principal / Periods;//月供本金
+	double monthlyPrincipal = Principal / (Periods - Period + 1);//月供本金
 	double remainPrincipal = Principal;//剩余本金
 
 	for (; Period <= Periods; Period++)//循环计算每一期的还款详情

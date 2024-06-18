@@ -32,3 +32,8 @@ EqualMonthlyInstallments::EqualMonthlyInstallments(string Name, double loanAmoun
 	m_Periods = Periods;
 	m_annualInterestRate = annualInterestRate;
 }
+
+vector<tuple<double, double, double, double>> Loan::getSchedule()
+{
+	return repaymentSchedule;
+}

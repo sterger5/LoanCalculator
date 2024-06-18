@@ -17,6 +17,11 @@ protected:
 	vector<tuple<double, double, double, double>> repaymentSchedule;//每一期的还款详情，储存在vector容器中
 public:
 	virtual void showSchedule() {};
+	vector<tuple<double, double, double, double>> getSchedule();
+	int getPeriods()
+	{
+		return m_Periods;
+	}
 };
 
 class EquivalentPrincipal :public Loan//等额本金偿还

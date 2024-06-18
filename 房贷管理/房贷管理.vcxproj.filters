@@ -30,6 +30,12 @@
     <ClCompile Include="printSchedule.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Prepay.h">
+      <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Prepay.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Loan.h">

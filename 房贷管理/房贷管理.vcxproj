@@ -130,6 +130,8 @@
     <ClCompile Include="getEMIschedule.cpp" />
     <ClCompile Include="getEPPschedule.cpp" />
     <ClCompile Include="Loan.cpp" />
+    <ClCompile Include="Prepay.cpp" />
+    <ClCompile Include="Prepay.h" />
     <ClCompile Include="printSchedule.cpp" />
     <ClCompile Include="房贷计算器.cpp" />
   </ItemGroup>
