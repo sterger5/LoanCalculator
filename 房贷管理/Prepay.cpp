@@ -67,9 +67,9 @@ void PartEMIprepay::showSchedule()
 
 		double monthlyRate = m_newRate / 12;
 
-		m_newPeriods = log(1 + 1 / (monthlyPay / (Principal * monthlyRate) - 1)) / log(1 + monthlyRate);
+		m_newPeriods = log(1 + 1 / (monthlyPay / (Principal * monthlyRate) - 1)) / log(1 + monthlyRate) + m_prepayTime;
 
-		auto tempVec = getEMIschedule(m_remainAmount - m_prepayAmount, m_newRate / 12, m_newPeriods, m_prepayTime);
+		auto tempVec = getEMIschedule(m_remainAmount - m_prepayAmount, m_newRate / 12, m_newPeriods, m_prepayTime + 1);
 
 		m_newSchedule.resize(m_prepayTime);
 
@@ -95,9 +95,9 @@ void PartEPPprepay::showSchedule()
 	{
 		double newPrincipal = m_remainAmount - m_prepayAmount;
 
-		m_newPeriods = newPrincipal / get<2>(m_newSchedule[0]);
+		m_newPeriods = newPrincipal / get<2>(m_newSchedule[0]) + m_prepayTime;
 
-		auto tempVec = getEPPschedule(m_remainAmount - m_prepayAmount, m_newRate / 12, m_newPeriods, m_prepayTime);
+		auto tempVec = getEPPschedule(m_remainAmount - m_prepayAmount, m_newRate / 12, m_newPeriods, m_prepayTime + 1);
 
 		m_newSchedule.resize(m_prepayTime);
 
