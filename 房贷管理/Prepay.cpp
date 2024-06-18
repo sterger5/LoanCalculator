@@ -1,108 +1,67 @@
-#include"Prepay.h"
+#pragma once
+#include <iostream>
+#include <vector>
+#include <iomanip> // 用于格式化输出
+#include <tuple> // 允许创建元组类型的数据结构
+#include <cmath> // 提供数学函数
+#include <numeric> // 提供累积函数，如求和
+#include "getEMIschedule.h" // 等额本息还款计划生成函数声明
+#include "getEPPschedule.h" // 等额本金还款计划生成函数声明
+#include "printSchedule.h" // 打印还款计划函数声明
 
-double Prepay::getRemainAmount(vector<tuple<double, double, double, double>>& Schedule)
-{
-	return get<1>(Schedule[m_prepayTime - 1]);
-}
+using namespace std; // 使用标准命名空间
 
-FullPrepay::FullPrepay(int prepayTime, vector<tuple<double, double, double, double>>& Schedule)
-{
-	m_remainAmount = getRemainAmount(Schedule);
-	m_prepayAmount = m_remainAmount;
-	m_prepayTime = prepayTime;
-	m_newSchedule = Schedule;
-}
+// 预付类，作为预付类型（全款预付、部分等额本息预付、部分等额本金预付）的基类
+class Prepay {
+protected:
+    int m_prepayTime = 1; // 预付发生的时间点（第几个月）
+    double m_remainAmount; // 剩余本金
+    double m_prepayAmount; // 预付金额
+    vector<tuple<double, double, double, double>> m_newSchedule; // 更新后的还款计划表
+    double m_newRate; // 更新后的利率（如果有的话）
 
-PartEMIprepay::PartEMIprepay(double prepayAmount, int prepayTime, double newRate,
-	vector<tuple<double, double, double, double>>& Schedule, int planFlag, int newPeriods)
-{
-	m_prepayAmount = prepayAmount;
-	m_prepayTime = prepayTime;
-	m_remainAmount = getRemainAmount(Schedule);
-	m_newSchedule = Schedule;
-	m_planFlag = planFlag;
-	m_newRate = newRate;
-	m_newPeriods = newPeriods;
-}
+public:
+    // 计算剩余本金
+    double getRemainAmount(vector<tuple<double, double, double, double>>& Schedule);
 
-PartEPPprepay::PartEPPprepay(double prepayAmount, int prepayTime, double newRate,
-	vector<tuple<double, double, double, double>>& Schedule, int planFlag, int newPeriods)
-{
-	m_prepayAmount = prepayAmount;
-	m_prepayTime = prepayTime;
-	m_remainAmount = getRemainAmount(Schedule);
-	m_newSchedule = Schedule;
-	m_planFlag = planFlag;
-	m_newRate = newRate;
-	m_newPeriods = newPeriods;
-}
+    // 纯虚函数，用于展示还款计划，子类需要实现
+    virtual void showSchedule() {}
+};
 
-void FullPrepay::showSchedule()
-{
-	m_newSchedule[m_prepayTime] = make_tuple(get<0>(m_newSchedule[m_prepayTime]), 0.0,
-		get<1>(m_newSchedule[m_prepayTime-1]), 0.0);
+// 全款预付类，继承自Prepay
+class FullPrepay : public Prepay {
+public:
+    // 构造函数，接收预付时间点和原还款计划
+    FullPrepay(int prepayTime, vector<tuple<double, double, double, double>>& Schedule);
 
-	m_newSchedule.resize(m_prepayTime + 1);
+    // 实现展示还款计划
+    void showSchedule();
+};
 
-	printSchedule(m_newSchedule);
-}
+// 部分等额本息预付类，继承自Prepay
+class PartEMIprepay : public Prepay {
+private:
+    int m_planFlag; // 方案标识
+    int m_newPeriods; // 更新后的还款期数
+public:
+    // 构造函数，接收预付金额、预付时间点、新利率、原还款计划、方案标识和新的还款期数
+    PartEMIprepay(double prepayAmount, int prepayTime, double newRate,
+        vector<tuple<double, double, double, double>>& Schedule, int planFlag, int newPeriods);
 
-void PartEMIprepay::showSchedule()
-{
-	if (m_planFlag == 1)
-	{
-		auto tempVec = getEMIschedule(m_remainAmount - m_prepayAmount, m_newRate / 12, m_newPeriods, m_prepayTime);
+    // 实现展示还款计划
+    void showSchedule();
+};
 
-		m_newSchedule.resize(m_prepayTime);
+// 部分等额本金预付类，继承自Prepay
+class PartEPPprepay : public Prepay {
+private:
+    int m_planFlag; // 方案标识
+    int m_newPeriods; // 更新后的还款期数
+public:
+    // 构造函数，接收预付金额、预付时间点、新利率、原还款计划、方案标识和新的还款期数
+    PartEPPprepay(double prepayAmount, int prepayTime, double newRate,
+        vector<tuple<double, double, double, double>>& Schedule, int planFlag, int newPeriods);
 
-		m_newSchedule.insert(m_newSchedule.end(), tempVec.begin(), tempVec.end());
-
-		printSchedule(m_newSchedule);
-	}
-	else if (m_planFlag == 2)
-	{
-		double monthlyPay = get<2>(m_newSchedule[m_prepayTime]) + get<3>(m_newSchedule[m_prepayTime]);
-
-		double Principal = m_remainAmount - m_prepayAmount;
-
-		double monthlyRate = m_newRate / 12;
-
-		m_newPeriods = log(1 + 1 / (monthlyPay / (Principal * monthlyRate) - 1)) / log(1 + monthlyRate) + m_prepayTime;
-
-		auto tempVec = getEMIschedule(m_remainAmount - m_prepayAmount, m_newRate / 12, m_newPeriods, m_prepayTime + 1);
-
-		m_newSchedule.resize(m_prepayTime);
-
-		m_newSchedule.insert(m_newSchedule.end(), tempVec.begin(), tempVec.end());
-
-		printSchedule(m_newSchedule);
-	}
-}
-
-void PartEPPprepay::showSchedule()
-{
-	if (m_planFlag == 1)
-	{
-		auto tempVec = getEPPschedule(m_remainAmount - m_prepayAmount, m_newRate / 12, m_newPeriods, m_prepayTime);
-
-		m_newSchedule.resize(m_prepayTime);
-
-		m_newSchedule.insert(m_newSchedule.end(), tempVec.begin(), tempVec.end());
-
-		printSchedule(m_newSchedule);
-	}
-	else if (m_planFlag == 2)
-	{
-		double newPrincipal = m_remainAmount - m_prepayAmount;
-
-		m_newPeriods = newPrincipal / get<2>(m_newSchedule[0]) + m_prepayTime;
-
-		auto tempVec = getEPPschedule(m_remainAmount - m_prepayAmount, m_newRate / 12, m_newPeriods, m_prepayTime + 1);
-
-		m_newSchedule.resize(m_prepayTime);
-
-		m_newSchedule.insert(m_newSchedule.end(), tempVec.begin(), tempVec.end());
-
-		printSchedule(m_newSchedule);
-	}
-}
+    // 实现展示还款计划
+    void showSchedule();
+};
